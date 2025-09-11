@@ -1,0 +1,84 @@
+<!-- web/index.html -->
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Web Chat</title>
+  <style>
+    body{font-family:system-ui,Arial;margin:0;display:flex;flex-direction:column;height:100vh}
+    header{padding:12px;background:#111;color:#fff}
+    #chat{flex:1;overflow:auto;padding:12px;background:#f6f6f6}
+    #inputBar{display:flex;padding:8px}
+    #msg{flex:1;padding:8px}
+    .msg{margin:6px 0;padding:8px;border-radius:6px;background:white;box-shadow:0 1px 2px rgba(0,0,0,0.05)}
+    .meta{font-size:12px;color:#666}
+  </style>
+</head>
+<body>
+  <header>
+    <span id="me">Web User</span>
+  </header>
+  <div id="chat"></div>
+  <div id="inputBar">
+    <input id="msg" placeholder="Type a message" />
+    <input type="file" id="file" />
+    <button id="send">Send</button>
+  </div>
+
+<script>
+  const WS_URL = 'ws://' + location.hostname + ':8766'; // adjust host if needed
+  let username = prompt('Enter display name') || 'web-' + Math.floor(Math.random()*1000);
+  document.getElementById('me').textContent = username;
+
+  const ws = new WebSocket(WS_URL);
+  const chat = document.getElementById('chat');
+  const msgInput = document.getElementById('msg');
+  const fileInput = document.getElementById('file');
+
+  function addMessage(text){
+    const d = document.createElement('div'); d.className='msg'; d.innerHTML = text; chat.appendChild(d); chat.scrollTop = chat.scrollHeight;
+  }
+
+  ws.onopen = () => {
+    const join = {type:'join',username:username,channel:'main'};
+    ws.send(JSON.stringify(join));
+  }
+
+  ws.onmessage = (e) => {
+    try{
+      const obj = JSON.parse(e.data);
+      if(obj.type === 'text' || obj.type === 'system'){
+        addMessage(`<div class="meta">${obj.username}</div><div>${obj.message}</div>`);
+      } else if(obj.type === 'file'){
+        const link = document.createElement('a');
+        link.href = 'data:application/octet-stream;base64,' + obj.data;
+        link.download = obj.filename;
+        link.textContent = `${obj.username} sent file: ${obj.filename} (click to download)`;
+        const wrapper = document.createElement('div'); wrapper.className='msg'; wrapper.appendChild(link); chat.appendChild(wrapper);
+      }
+    }catch(err){console.error(err)}
+  }
+
+  document.getElementById('send').addEventListener('click', send);
+  msgInput.addEventListener('keydown', (e)=>{ if(e.key==='Enter') send(); });
+
+  function send(){
+    const text = msgInput.value.trim();
+    if(text){
+      ws.send(JSON.stringify({type:'text',username:username,channel:'main',message:text}));
+      msgInput.value = '';
+    } else if(fileInput.files.length){
+      const f = fileInput.files[0];
+      const reader = new FileReader();
+      reader.onload = () => {
+        const b64 = reader.result.split(',')[1];
+        ws.send(JSON.stringify({type:'file',username:username,channel:'main',filename:f.name,data:b64}));
+        fileInput.value = '';
+      };
+      reader.readAsDataURL(f); // results like data:...;base64,AAA
+    }
+  }
+</script>
+</body>
+</html>
