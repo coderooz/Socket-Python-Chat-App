@@ -1,0 +1,14 @@
+-r requirements.txt
+
+# Lint / Format / Types
+ruff>=0.8.0
+mypy>=1.10.0
+# types-websockets not available on this index
+
+# Testing
+pytest>=8.0
+pytest-asyncio>=0.23
+pytest-cov>=5.0
+
+# Dev helpers (optional)
+python-dotenv>=1.0

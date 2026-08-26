@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/coderooz/Socket-Python-Chat-App/blob/main/SECURITY.md
+    about: Do not open a public issue — email contact@coderooz.in instead
+  - name: Discussions / Questions
+    url: https://github.com/coderooz/Socket-Python-Chat-App/discussions
+    about: Ask questions or brainstorm ideas

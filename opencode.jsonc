@@ -1,0 +1,33 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "opencode/deepseek-v4-flash-free",
+  "small_model": "ollama/qwen2.5-coder:3b",
+  "permission": {
+    "*": "allow"
+  },
+  "instructions": [
+    "./AGENTS.md"
+  ],
+  "formatter": {
+    "prettier": {
+      "extensions": [".py", ".md", ".json", ".yaml", ".yml", ".html"]
+    }
+  },
+  "lsp": {
+    "python": {
+      "command": ["pylsp"],
+      "extensions": [".py"]
+    }
+  },
+  "watcher": {
+    "ignore": [
+      "venv",
+      ".venv",
+      "__pycache__",
+      ".pytest_cache",
+      ".ruff_cache",
+      ".mypy_cache",
+      "htmlcov"
+    ]
+  }
+}

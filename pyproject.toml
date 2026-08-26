@@ -1,0 +1,70 @@
+[project]
+name = "socket-python-chat-app"
+version = "0.1.0"
+description = "Multi-client chat: asyncio server bridging raw TCP (Tkinter) and WebSocket (browser) clients"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Ranit Saha", email = "contact@coderooz.in" }]
+maintainers = [{ name = "Coderooz", email = "contact@coderooz.in" }]
+keywords = ["chat", "asyncio", "websocket", "tkinter", "socket"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Communications :: Chat",
+  "Framework :: AsyncIO",
+]
+requires-python = ">=3.10"
+dependencies = [
+  "websockets>=10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/coderooz/Socket-Python-Chat-App"
+Repository = "https://github.com/coderooz/Socket-Python-Chat-App"
+Issues = "https://github.com/coderooz/Socket-Python-Chat-App/issues"
+Changelog = "https://github.com/coderooz/Socket-Python-Chat-App/blob/main/CHANGELOG.md"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "C4", "UP", "N", "S", "TCH", "TID", "Q"]
+ignore = ["S101", "S104", "S603", "S607"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = true
+ignore_missing_imports = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+disable_error_code = ["var-annotated", "no-any-return", "arg-type", "attr-defined"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = "-q --tb=short"
+
+[tool.coverage.run]
+source = ["."]
+omit = ["tests/*", "venv/*", ".venv/*", "web/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false

@@ -1,0 +1,95 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "install: pip requirements",
+      "type": "shell",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe -m pip install -r requirements.txt",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "lint: ruff check",
+      "type": "shell",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe -m ruff check .",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": "$eslint-stylish"
+    },
+    {
+      "label": "lint: ruff check --fix",
+      "type": "shell",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe -m ruff check --fix .",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "format: ruff format",
+      "type": "shell",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe -m ruff format .",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "typecheck: mypy",
+      "type": "shell",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe -m mypy .",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "test: pytest",
+      "type": "shell",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe -m pytest -v",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "run: server",
+      "type": "shell",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe server.py",
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "run: web static server (port 8000)",
+      "type": "shell",
+      "command": "${workspaceFolder}/venv/Scripts/python.exe -m http.server 8000 --directory web",
+      "group": "build",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

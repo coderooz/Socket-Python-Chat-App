@@ -1,16 +1,32 @@
 # server.py
 import asyncio
-import json
 import datetime
+import json
+import os
+
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass
+
 from websockets import serve as websocket_serve
 
+# Config via env (see .env.example)
+HOST = os.getenv("HOST", "0.0.0.0")
+TCP_PORT = int(os.getenv("TCP_PORT", "8765"))
+WS_PORT = int(os.getenv("WS_PORT", "8766"))
+CHANNEL = os.getenv("CHANNEL", "main")
+
 # TCP clients: use a list because dicts are unhashable
-TCP_CLIENTS = []
-WS_CLIENTS = set()
-CHANNEL = "main"
+TCP_CLIENTS: list[dict] = []
+WS_CLIENTS: set = set()
+
 
 def now_iso():
     return datetime.datetime.utcnow().isoformat() + "Z"
+
 
 async def broadcast(message_json: str):
     """Send message_json (string) to all clients (both TCP and WS)."""
@@ -34,6 +50,7 @@ async def broadcast(message_json: str):
         except Exception as e:
             print("Error writing to ws client:", e)
             WS_CLIENTS.discard(ws)
+
 
 async def handle_tcp_client(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
     addr = writer.get_extra_info("peername")
@@ -82,7 +99,7 @@ async def handle_tcp_client(reader: asyncio.StreamReader, writer: asyncio.Stream
         try:
             writer.close()
             await writer.wait_closed()
-        except Exception:
+        except Exception:  # noqa: S110
             pass
         print("TCP client disconnected", addr)
 
@@ -98,6 +115,7 @@ async def handle_tcp_client(reader: asyncio.StreamReader, writer: asyncio.Stream
                 }
             )
             await broadcast(leave)
+
 
 # Accept optional `path` to be compatible with different websockets versions
 async def handle_ws(ws, path=None):
@@ -118,18 +136,26 @@ async def handle_ws(ws, path=None):
         WS_CLIENTS.discard(ws)
         print("WS client disconnected")
 
+
 async def main():
-    print("Starting server...")
-    tcp_server = await asyncio.start_server(handle_tcp_client, "0.0.0.0", 8765)
+    msg = (
+        f"Starting server (HOST={HOST} "
+        f"TCP={TCP_PORT} "
+        f"WS={WS_PORT} "
+        f"CHANNEL={CHANNEL})..."
+    )
+    print(msg)
+    tcp_server = await asyncio.start_server(handle_tcp_client, HOST, TCP_PORT)
     # websockets.serve will pass either (ws, path) or just (ws) depending on version;
     # our handler accepts an optional `path`.
-    ws_server = await websocket_serve(handle_ws, "0.0.0.0", 8766)
+    _ws_server = await websocket_serve(handle_ws, HOST, WS_PORT)
 
     addrs = ", ".join(str(sock.getsockname()) for sock in tcp_server.sockets)
-    print(f"TCP server listening on {addrs}, WebSocket on 8766")
+    print(f"TCP server listening on {addrs}, WebSocket on {WS_PORT}")
 
     async with tcp_server:
         await asyncio.Future()  # run forever
+
 
 if __name__ == "__main__":
     try:
