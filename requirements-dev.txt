@@ -6,7 +6,7 @@ mypy>=1.10.0
 # types-websockets not available on this index
 
 # Testing
-pytest>=8.0
+pytest>=9.1.1
 pytest-asyncio>=0.23
 pytest-cov>=5.0
 
