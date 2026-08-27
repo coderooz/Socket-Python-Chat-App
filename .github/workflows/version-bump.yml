@@ -1,0 +1,69 @@
+name: Version Bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Version bump type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - prerelease
+      prerelease_label:
+        description: 'Prerelease label (for prerelease bump)'
+        required: false
+        type: string
+        default: 'rc'
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install bumpver
+        run: pip install bumpver
+
+      - name: Bump version
+        id: bump
+        run: |
+          BUMP_TYPE="${{ github.event.inputs.bump }}"
+          if [ "$BUMP_TYPE" = "prerelease" ]; then
+            LABEL="${{ github.event.inputs.prerelease_label }}"
+            bumpver update --prerelease "$LABEL"
+          else
+            bumpver update "$BUMP_TYPE"
+          fi
+          NEW_VERSION=$(grep '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Commit and tag
+        run: |
+          git add pyproject.toml
+          git commit -m "chore(release): v${{ steps.bump.outputs.new_version }}"
+          git tag "v${{ steps.bump.outputs.new_version }}"
+          git push origin main --tags
+
+      - name: Output new version
+        run: echo "Bumped to v${{ steps.bump.outputs.new_version }}"
