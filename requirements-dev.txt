@@ -1,7 +1,7 @@
 -r requirements.txt
 
 # Lint / Format / Types
-ruff>=0.8.0
+ruff>=0.16.9
 mypy>=1.10.0
 # types-websockets not available on this index
 
