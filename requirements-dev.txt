@@ -11,4 +11,4 @@ pytest-asyncio>=0.23
 pytest-cov>=5.0
 
 # Dev helpers (optional)
-python-dotenv>=1.0
+python-dotenv>=1.2.4
